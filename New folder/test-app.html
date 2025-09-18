@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intellex AI – Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base & Theming --- */
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; }
+        
+        /* --- Glassmorphism Panels --- */
+        .glass-panel { background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .input-form-glass { background: rgba(28, 28, 28, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        
+        /* --- Chat Bubbles --- */
+        .chat-bubble-user { background-color: #2a2a2a; border: 1px solid #3a3a3a; }
+        .chat-bubble-ai { background: rgba(25, 25, 25, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* --- Input & Scrollbars --- */
+        #chat-input { background-color: transparent; border: none; }
+        #chat-input:focus { outline: none; box-shadow: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 3px; }
+        
+        /* --- Animations & Transitions --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .message { animation: fadeIn 0.3s ease-out; }
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        #drag-drop-overlay { transition: opacity 0.2s ease-in-out; }
+        .trust-score-gauge circle { transition: stroke-dashoffset 1s ease-out; }
+
+        /* --- Typing Indicator Animation --- */
+        .typing-indicator span { height: 8px; width: 8px; float: left; margin: 0 1px; background-color: #9ca3af; display: block; border-radius: 50%; opacity: 0.4; animation: typing 1s infinite; }
+        .typing-indicator span:nth-of-type(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-of-type(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 50%, 100% { opacity: 0.4; } 25% { opacity: 1; } }
+        
+        /* --- UI Components --- */
+        .trust-score-gauge { width: 120px; height: 120px; position: relative; }
+        
+        /* --- History Sidebar Menu --- */
+        .history-item:hover .history-menu-btn { opacity: 1; }
+        .history-menu { display: none; position: absolute; right: 0; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 0.5rem; z-index: 10; padding: 0.5rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .history-menu button { display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; font-size: 0.875rem; color: #d1d5db; }
+        .history-menu button:hover { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar trigger area -->
+    <div id="sidebar-hover-trigger" class="fixed top-0 left-0 h-full w-4 z-50"></div>
+
+    <!-- Sidebar for Chat History -->
+    <aside id="sidebar" class="w-64 bg-black/80 backdrop-blur-sm border-r border-white/10 flex-col flex-shrink-0 absolute inset-y-0 left-0 transform -translate-x-full z-50">
+        <div class="p-4 flex justify-between items-center border-b border-white/10">
+            <a href="#" onclick="location.reload()" class="px-4 py-2 w-full text-center rounded-lg border-2 border-dashed border-gray-600 hover:border-gray-400 transition text-gray-400 hover:text-white">+ New Chat</a>
+        </div>
+        <nav id="history-nav" class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+            <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">History</p>
+            <div id="history-list" class="space-y-1"></div>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div id="main-content" class="flex-1 flex flex-col relative">
+        <header class="bg-black/80 backdrop-blur-sm border-b border-white/10 top-0 left-0 right-0 z-40 flex-shrink-0">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" onclick="location.reload()" class="text-2xl font-bold tracking-tight">Intellex</a>
+                <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
+                    <a href="#" class="hover:text-white transition">Docs</a>
+                    <a href="https://github.com" target="_blank" class="hover:text-white transition">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="flex-1 flex flex-col pb-24 overflow-hidden">
+             <div id="chat-container" class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
+                <!-- Welcome screen, shown on first load -->
+                <div id="initial-welcome-screen" class="flex flex-col items-center justify-center h-full text-center">
+                    <div class="max-w-3xl mx-auto">
+                        <h1 class="text-5xl font-bold mb-3">Intellex</h1>
+                        <p class="text-gray-400 mb-8">Begin your analysis by pasting text, a URL, or uploading an image/video.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto">
+                            <div class="bg-white/5 p-4 rounded-lg border border-white/10 text-left"><h3 class="font-semibold mb-1">Analyze Text & Images</h3><p class="text-sm text-gray-400">Detect if content is human or AI written.</p></div>
+                            <div class="bg-white/5 p-4 rounded-lg border border-white/10 text-left"><h3 class="font-semibold mb-1">Detect Deepfake Videos</h3><p class="text-sm text-gray-400">Analyze video files for manipulation.</p></div>
+                            <div class="sm:col-span-2 bg-white/5 p-4 rounded-lg border border-white/10 text-left"><h3 class="font-semibold mb-1">Analyze News Articles</h3><p class="text-sm text-gray-400">Paste an article link for deep analysis and bias detection.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chat messages will be appended here -->
+                <div id="message-list" class="max-w-3xl mx-auto space-y-6"></div>
+            </div>
+
+            <!-- Chat Input Form -->
+            <div class="absolute bottom-0 left-0 right-0 pointer-events-none">
+                <div class="max-w-3xl mx-auto p-4">
+                    <!-- File Preview Container -->
+                     <div id="file-preview-container" class="hidden mb-2 pointer-events-auto">
+                         <div class="bg-black/50 backdrop-blur-md border border-white/10 rounded-lg p-2 flex items-center justify-between">
+                             <div class="flex items-center gap-3">
+                                 <img id="image-preview" class="hidden h-12 w-12 object-cover rounded-md" alt="Image preview">
+                                 <div id="video-preview" class="hidden items-center gap-3">
+                                     <svg class="w-8 h-8 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.55a1 1 0 011.45.89V14a1 1 0 01-1.45.89L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                     <span id="video-filename" class="text-sm text-white truncate"></span>
+                                 </div>
+                                 <div id="url-preview" class="hidden items-center gap-3">
+                                     <svg class="w-8 h-8 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.282a4 4 0 000-5.656l-4-4a4 4 0 00-5.656 0L10 9"></path></svg>
+                                     <span id="url-text" class="text-sm text-white truncate"></span>
+                                 </div>
+                             </div>
+                             <button type="button" id="remove-file-button" class="p-1 text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                         </div>
+                     </div>
+                    <form id="chat-form" class="input-form-glass rounded-2xl p-2 flex items-end gap-2 pointer-events-auto">
+                        <button type="button" id="upload-button" class="text-gray-400 hover:text-white transition p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg></button>
+                        <textarea id="chat-input" rows="1" class="flex-1 w-full text-sm text-white p-2 resize-none" placeholder="Paste text, a URL, or drop a file..."></textarea>
+                        <button type="submit" class="text-white bg-white/10 hover:bg-white/20 transition p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+                    </form>
+                    <input type="file" id="file-upload" class="hidden" accept="image/*,video/*">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Drag and Drop Overlay -->
+    <div id="drag-drop-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center opacity-0 pointer-events-none">
+        <div class="text-center p-8 border-2 border-dashed border-gray-500 rounded-2xl">
+            <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V6a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7z"></path><path d="M10 9L12 11L14 9"></path><path d="M12 11L12 3"></path></svg>
+            <h2 class="mt-4 text-2xl font-bold">Drop file to analyze</h2>
+            <p class="text-gray-500">Release your file to begin the detection process.</p>
+        </div>
+    </div>
+
+    <!-- Context Menu for History Items -->
+    <div id="history-context-menu" class="history-menu absolute">
+        <button id="rename-chat-btn">Rename</button>
+        <button id="delete-chat-btn">Delete</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element Selectors ---
+            const get = (id) => document.getElementById(id);
+            const chatForm = get('chat-form'), chatInput = get('chat-input'), welcomeScreen = get('initial-welcome-screen');
+            const messageList = get('message-list'), sidebar = get('sidebar'), sidebarHoverTrigger = get('sidebar-hover-trigger');
+            const uploadButton = get('upload-button'), fileUpload = get('file-upload'), filePreviewContainer = get('file-preview-container');
+            const imagePreview = get('image-preview'), videoPreview = get('video-preview'), videoFilename = get('video-filename'), urlPreview = get('url-preview'), urlText = get('url-text');
+            const removeFileButton = get('remove-file-button'), mainContent = get('main-content'), dragDropOverlay = get('drag-drop-overlay'), historyList = get('history-list');
+            const historyContextMenu = get('history-context-menu'), renameChatBtn = get('rename-chat-btn'), deleteChatBtn = get('delete-chat-btn');
+            
+            // --- State Variables ---
+            let attachedFile = null;
+            let attachedUrl = null;
+            let activeHistoryItem = null; // To track which history item's context menu is open
+            const BACKEND_URL = "http://127.0.0.1:5000"; // Centralized backend URL
+
+            // --- Event Listeners ---
+            sidebarHoverTrigger.addEventListener('mouseenter', () => sidebar.classList.remove('-translate-x-full'));
+            sidebar.addEventListener('mouseleave', () => sidebar.classList.add('-translate-x-full'));
+            chatInput.addEventListener('input', autoResizeInput);
+            chatInput.addEventListener('keydown', handleEnterKey);
+            uploadButton.addEventListener('click', () => fileUpload.click());
+            fileUpload.addEventListener('change', (e) => handleFile(e.target.files[0]));
+            removeFileButton.addEventListener('click', removeAttachment);
+            chatForm.addEventListener('submit', handleFormSubmit);
+
+            // Drag and Drop Listeners for the main content area
+            mainContent.addEventListener('dragover', (e) => { 
+                e.preventDefault(); 
+                if (e.dataTransfer.types.includes('Files')) {
+                    dragDropOverlay.classList.remove('opacity-0', 'pointer-events-none'); 
+                }
+            });
+            mainContent.addEventListener('dragleave', () => dragDropOverlay.classList.add('opacity-0', 'pointer-events-none'));
+            mainContent.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragDropOverlay.classList.add('opacity-0', 'pointer-events-none');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
+                } else if (e.dataTransfer.getData('text/plain')) {
+                    const droppedText = e.dataTransfer.getData('text/plain');
+                    chatInput.value = droppedText;
+                    autoResizeInput();
+                    handleFormSubmit(e); // Automatically submit if text/URL is dropped
+                }
+            });
+
+            // History Item Event Delegation
+            historyList.addEventListener('click', (e) => {
+                const historyItem = e.target.closest('.history-item');
+                const menuBtn = e.target.closest('.history-menu-btn');
+                if (menuBtn && historyItem) {
+                     e.preventDefault();
+                     e.stopPropagation();
+                     activeHistoryItem = historyItem;
+                     historyContextMenu.style.display = 'block';
+                     historyContextMenu.style.left = `${e.pageX}px`;
+                     historyContextMenu.style.top = `${e.pageY}px`;
+                } else if (historyItem) {
+                    // This is where you would load a past chat. For now, it just highlights.
+                    historyList.querySelectorAll('.history-item').forEach(item => item.classList.remove('active-history', 'bg-white/10'));
+                    historyItem.classList.add('active-history', 'bg-white/10');
+                }
+            });
+
+            // Context Menu Actions
+            document.addEventListener('click', (e) => {
+                if (!historyContextMenu.contains(e.target) && !e.target.closest('.history-menu-btn')) {
+                    historyContextMenu.style.display = 'none';
+                }
+            });
+
+            renameChatBtn.addEventListener('click', () => {
+                if (activeHistoryItem) {
+                    const currentTitle = activeHistoryItem.querySelector('.chat-title').textContent;
+                    const newTitle = prompt('Enter new chat name:', currentTitle);
+                    if (newTitle && newTitle.trim() !== '') {
+                        activeHistoryItem.querySelector('.chat-title').textContent = newTitle.trim();
+                    }
+                }
+                historyContextMenu.style.display = 'none';
+            });
+
+            deleteChatBtn.addEventListener('click', () => {
+                if (activeHistoryItem) {
+                    // Replace confirm with a custom modal in a real app
+                    const title = activeHistoryItem.querySelector('.chat-title').textContent;
+                    if (confirm(`Are you sure you want to delete "${title}"?`)) {
+                        activeHistoryItem.remove();
+                    }
+                }
+                historyContextMenu.style.display = 'none';
+            });
+
+            // --- Main Application Logic ---
+            async function handleFormSubmit(e) {
+                e.preventDefault();
+                const userInput = chatInput.value.trim();
+                if (!userInput && !attachedFile) return;
+
+                if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+                
+                let chatTitle;
+                let endpoint;
+                let body;
+                let headers = {};
+
+                if (attachedFile) {
+                    chatTitle = attachedFile.name;
+                    const formData = new FormData();
+                    formData.append("file", attachedFile);
+                    endpoint = attachedFile.type.startsWith('video/') ? "/detect-video" : "/detect-image";
+                    body = formData;
+                } else if (isValidUrl(userInput)) {
+                    chatTitle = userInput;
+                    endpoint = "/detect-url";
+                    body = JSON.stringify({ url: userInput });
+                    headers['Content-Type'] = 'application/json';
+                    attachedUrl = userInput; // Store URL for display
+                } else {
+                    chatTitle = userInput.substring(0, 40) + (userInput.length > 40 ? '...' : '');
+                    endpoint = "/detect";
+                    body = JSON.stringify({ text: userInput });
+                    headers['Content-Type'] = 'application/json';
+                }
+
+                if (messageList.children.length === 0) { // Only add to history on the first message of a chat
+                    updateHistory(chatTitle);
+                }
+                displayUserMessage(userInput, attachedFile, attachedUrl);
+                
+                chatInput.value = '';
+                autoResizeInput();
+                removeAttachment();
+                displayTypingIndicator();
+
+                try {
+                    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+                        method: "POST", 
+                        headers: headers,
+                        body: body
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || `HTTP error! Status: ${response.status}`);
+                    displayAiResponse(result);
+                } catch (err) {
+                    console.error("Fetch error:", err);
+                    displayError(err.message || "Could not connect to the backend. Is it running?");
+                }
+            }
+            
+            // --- UI Helper Functions ---
+            function updateHistory(title) {
+                historyList.querySelectorAll('.history-item').forEach(item => item.classList.remove('active-history', 'bg-white/10'));
+                
+                const newLink = document.createElement('a');
+                newLink.href = "#";
+                newLink.className = "history-item flex justify-between items-center px-4 py-2 rounded-lg text-sm text-gray-300 hover:bg-white/20 transition group relative active-history bg-white/10";
+                
+                newLink.innerHTML = `
+                    <span class="chat-title truncate">${title}</span>
+                    <button class="history-menu-btn opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-white/20">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                    </button>
+                `;
+                historyList.prepend(newLink);
+            }
+
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return string.startsWith('http://') || string.startsWith('https://');
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function handleFile(file) {
+                if (!file) return;
+                removeAttachment(); 
+                attachedFile = file;
+                filePreviewContainer.classList.remove('hidden');
+
+                if (file.type.startsWith('image/')) {
+                    imagePreview.classList.remove('hidden');
+                    const reader = new FileReader();
+                    reader.onload = (e) => { imagePreview.src = e.target.result; };
+                    reader.readAsDataURL(file);
+                } else if (file.type.startsWith('video/')) {
+                    videoPreview.classList.remove('hidden');
+                    videoFilename.textContent = file.name;
+                } else {
+                    displayError("Unsupported file type. Please upload an image or video.");
+                    removeAttachment();
+                }
+            }
+
+            function displayUserMessage(text, file, url) {
+                let mediaHtml = '';
+                if (file) {
+                    const objectURL = URL.createObjectURL(file);
+                    if (file.type.startsWith('image/')) {
+                        mediaHtml = `<img src="${objectURL}" class="mt-2 rounded-lg max-h-48 w-auto" alt="Uploaded Image">`;
+                    } else if (file.type.startsWith('video/')) {
+                        mediaHtml = `<div class="mt-2 p-3 bg-black/20 rounded-lg text-sm border border-white/10 flex items-center gap-2"><svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.55a1 1 0 011.45.89V14a1 1 0 01-1.45.89L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg><span class="truncate">${file.name}</span></div>`;
+                    }
+                } else if (url) {
+                    mediaHtml = `<div class="mt-2 p-3 bg-black/20 rounded-lg text-sm border border-white/10 flex items-center gap-2"><svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.282a4 4 0 000-5.656l-4-4a4 4 0 00-5.656 0L10 9"></path></svg><a href="${url}" target="_blank" class="text-blue-400 hover:underline truncate">${url}</a></div>`;
+                }
+                const textHtml = text && !url ? `<p class="whitespace-pre-wrap">${text}</p>` : '';
+                messageList.insertAdjacentHTML('beforeend', `<div class="message flex justify-end"><div class="chat-bubble-user max-w-lg p-4 rounded-2xl rounded-br-none">${textHtml}${mediaHtml}</div></div>`);
+                scrollToBottom();
+            }
+
+            function displayTypingIndicator() {
+                const typingHtml = `<div id="typing-indicator" class="message flex justify-start"><div class="chat-bubble-ai p-4 rounded-2xl rounded-bl-none"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
+                messageList.insertAdjacentHTML('beforeend', typingHtml);
+                scrollToBottom();
+            }
+            
+            function displayAiResponse(result) {
+                removeTypingIndicator();
+                let analysisHtml = '';
+
+                if (result.error) {
+                    analysisHtml = `<p class="font-semibold text-red-400">❌ Error</p><p class="mt-2 text-gray-300">${result.error}</p>`;
+                } 
+                else if (result.type === 'url_analysis') {
+                    analysisHtml = createUrlAnalysisHtml(result);
+                } 
+                else if (result.type === 'text') {
+                    const score = result.analysis === 'Human Written' ? result.human_prob : 100 - result.ai_prob;
+                    let summaryText = `This text is likely ${result.analysis}.`;
+                    const titleText = 'Text Analysis Complete';
+                    analysisHtml = createTrustScoreHtml(score, summaryText, titleText);
+                } else if (result.type === 'image' || result.type === 'video') {
+                    const score = result.is_ai ? 100 - result.confidence : result.confidence;
+                    const titleText = result.type === 'image' ? 'Image Analysis Complete' : 'Video Analysis Complete';
+                    let summaryText = result.summary;
+                    if (result.source_url) {
+                        summaryText += ` <a href="${result.source_url}" target="_blank" class="text-blue-400 hover:underline text-sm">(Source)</a>`;
+                    }
+                    analysisHtml = createTrustScoreHtml(score, summaryText, titleText);
+                }
+                
+                const aiMessageHtml = `<div class="message flex justify-start"><div class="chat-bubble-ai max-w-lg p-4 rounded-2xl rounded-bl-none">${analysisHtml}</div></div>`;
+                messageList.insertAdjacentHTML('beforeend', aiMessageHtml);
+                scrollToBottom();
+            }
+
+            function createUrlAnalysisHtml(result) {
+                let verdictColorClass = 'text-yellow-400';
+                if (result.verdict === 'Likely Credible') verdictColorClass = 'text-green-400';
+                if (result.verdict === 'Highly Suspect') verdictColorClass = 'text-red-400';
+
+                let redFlagsHtml = '<p class="text-sm text-gray-400">No specific red flags identified.</p>';
+                if (result.red_flags && result.red_flags.length > 0) {
+                    redFlagsHtml = `
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-300">
+                            ${result.red_flags.map(flag => `<li>${flag}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+
+                return `
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-semibold text-lg">Article Analysis Complete</p>
+                            <a href="${result.title}" target="_blank" class="text-xs text-blue-400 hover:underline truncate block">${result.title}</a>
+                        </div>
+                        <div class="p-3 bg-black/30 rounded-lg">
+                            <p class="font-semibold mb-1">Credibility Verdict</p>
+                            <p class="font-bold text-lg ${verdictColorClass}">${result.verdict}</p>
+                        </div>
+                        <div class="p-3 bg-black/30 rounded-lg">
+                            <p class="font-semibold mb-1">Summary</p>
+                            <p class="text-sm text-gray-300">${result.summary}</p>
+                        </div>
+                        <div class="p-3 bg-black/30 rounded-lg">
+                            <p class="font-semibold mb-2">Identified Red Flags</p>
+                            ${redFlagsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            function createTrustScoreHtml(score, summary, title) {
+                const { strokeColor, textColor } = getScoreColors(score);
+                const radius = 52;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (score / 100) * circumference;
+                return `
+                    <div class="flex items-center gap-4">
+                        <div class="trust-score-gauge flex-shrink-0">
+                            <svg class="w-full h-full" viewBox="0 0 120 120">
+                                <circle class="text-gray-700" stroke-width="8" stroke="currentColor" fill="transparent" r="${radius}" cx="60" cy="60"/>
+                                <circle class="${strokeColor}" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="60" cy="60"
+                                    style="stroke-dasharray:${circumference}; stroke-dashoffset:${offset}; transform: rotate(-90deg); transform-origin: 50% 50%;" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                   <span class="text-3xl font-bold ${textColor}">${Math.round(score)}</span>
+                                   <span class="text-xs text-gray-400">Trust Score</span>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                           <p class="font-semibold ${textColor}">${title}</p>
+                           <p class="mt-1 text-gray-300 text-sm">${summary}</p>
+                        </div>
+                    </div>`;
+            }
+            
+            function getScoreColors(score) {
+                const strokeColor = score > 75 ? 'text-green-500' : score > 40 ? 'text-yellow-500' : 'text-red-500';
+                const textColor = score > 75 ? 'text-green-400' : score > 40 ? 'text-yellow-400' : 'text-red-400';
+                return { strokeColor, textColor };
+            }
+
+            function displayError(message) {
+                removeTypingIndicator();
+                const errorHtml = `<div class="message flex justify-start"><div class="chat-bubble-ai max-w-lg p-4 rounded-2xl rounded-bl-none"><p class="font-semibold text-red-400">❌ Error</p><p class="mt-2 text-gray-300">${message}</p></div></div>`;
+                messageList.insertAdjacentHTML('beforeend', errorHtml);
+                scrollToBottom();
+            }
+
+            function scrollToBottom() {
+                const container = get('chat-container');
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function autoResizeInput() {
+                chatInput.style.height = 'auto';
+                chatInput.style.height = (chatInput.scrollHeight) + 'px';
+            }
+
+            function handleEnterKey(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                }
+            }
+
+            function removeAttachment() {
+                attachedFile = null;
+                attachedUrl = null;
+                fileUpload.value = null; 
+                filePreviewContainer.classList.add('hidden');
+                imagePreview.classList.add('hidden');
+                videoPreview.classList.add('hidden');
+                urlPreview.classList.add('hidden');
+            }
+
+            function removeTypingIndicator() {
+                const indicator = get('typing-indicator');
+                if (indicator) indicator.remove();
+            }
+        });
+    </script>
+</body>
+</html>

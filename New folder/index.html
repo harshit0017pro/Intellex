@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intellex - AI Deepfake & Fake News Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        .gradient-bg {
+            background-image: radial-gradient(circle at top, rgba(128, 0, 128, 0.2), transparent 40%),
+                              radial-gradient(circle at bottom right, rgba(0, 0, 255, 0.2), transparent 50%),
+                              radial-gradient(circle at bottom left, rgba(255, 20, 147, 0.15), transparent 60%);
+            background-attachment: fixed;
+        }
+        .scroll-animation {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-animation.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-lg">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Intellex</h1>
+            <div class="hidden md:flex items-center space-x-8 text-sm">
+                <a href="#problem" class="hover:text-gray-300 transition">The Problem</a>
+                <a href="#features" class="hover:text-gray-300 transition">Features</a>
+                <a href="https://github.com" target="_blank" class="hover:text-gray-300 transition">GitHub</a>
+                <a href="#" class="hover:text-gray-300 transition">Contact</a>
+            </div>
+             <a href="app.html" class="bg-white text-black font-semibold py-2 px-5 rounded-lg hover:bg-gray-200 transition">Try Intellex</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center text-center pt-20 px-4">
+        <div class="max-w-4xl">
+            <h2 class="text-6xl md:text-8xl font-black leading-tight tracking-tight mb-4 scroll-animation">
+                See the Truth.
+                <br />
+                <span class="text-gray-400">Detect the Fake.</span>
+            </h2>
+            <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8 scroll-animation" style="transition-delay: 200ms;">
+                Intellex is an advanced AI-powered platform for the real-time detection of misinformation, deepfakes, and false facts.
+            </p>
+            <div class="space-x-4 scroll-animation" style="transition-delay: 400ms;">
+                <a href="#problem" class="bg-transparent border border-white text-white font-semibold py-3 px-8 rounded-lg hover:bg-white hover:text-black transition">Learn More</a>
+                <a href="app.html" class="bg-white text-black font-semibold py-3 px-8 rounded-lg hover:bg-gray-200 transition">Launch App</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem" class="py-20 md:py-32 px-4">
+        <div class="container mx-auto text-center max-w-3xl scroll-animation">
+            <h3 class="text-4xl md:text-5xl font-bold mb-6">Why Intellex?</h3>
+            <p class="text-lg text-gray-300 leading-relaxed">
+                In an era of digital saturation, misinformation and sophisticated deepfakes spread faster than ever, eroding trust and distorting reality. Intellex is your essential tool to cut through the noise, providing a layer of verification with advanced AI detection to help you distinguish authentic content from AI-generated falsehoods.
+            </p>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+     <section id="how-it-works" class="py-20 md:py-32 px-4">
+        <div class="container mx-auto text-center max-w-3xl scroll-animation">
+            <h3 class="text-4xl md:text-5xl font-bold mb-6">A Multi-Layered AI Approach</h3>
+            <p class="text-lg text-gray-300 leading-relaxed">
+                Our system is built on a hybrid intelligence model. When you input content—whether it's an article URL, a block of text, an image, or a video—Intellex initiates a two-stage process. First, specialized machine learning models scan for statistical artifacts and inconsistencies typical of AI generation. Second, we leverage the advanced reasoning of the Gemini API to perform a deeper contextual analysis, checking for logical fallacies, emotional manipulation, and consistency with known facts. This dual approach allows Intellex to not just identify fakes, but to understand *why* they might be misleading.
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 md:py-32 px-4">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Card 1 -->
+                <a href="deepfake-detection.html" class="block">
+                    <div class="glass-card p-8 rounded-2xl h-full scroll-animation">
+                        <h4 class="text-xl font-bold mb-2">🔍 Deepfake Video Detection</h4>
+                        <p class="text-gray-400">Upload video clips to analyze pixel-level inconsistencies and identify AI-manipulated footage.</p>
+                    </div>
+                </a>
+                <!-- Card 2 -->
+                <a href="news-classifier.html" class="block">
+                    <div class="glass-card p-8 rounded-2xl h-full scroll-animation" style="transition-delay: 150ms;">
+                        <h4 class="text-xl font-bold mb-2">📰 Fake News Classifier</h4>
+                        <p class="text-gray-400">Paste article text or URLs to evaluate language patterns, source reliability, and potential bias.</p>
+                    </div>
+                </a>
+                <!-- Card 3 -->
+                <a href="fact-summary.html" class="block">
+                    <div class="glass-card p-8 rounded-2xl h-full scroll-animation" style="transition-delay: 300ms;">
+                        <h4 class="text-xl font-bold mb-2">✨ AI Fact Summary</h4>
+                        <p class="text-gray-400">Get concise, AI-generated summaries of fact-checking results, powered by the Gemini API.</p>
+                    </div>
+                </a>
+                <!-- Card 4 -->
+                <a href="cloud-model.html" class="block">
+                    <div class="glass-card p-8 rounded-2xl h-full scroll-animation" style="transition-delay: 450ms;">
+                        <h4 class="text-xl font-bold mb-2">☁️ Cloud-Based AI Model</h4>
+                        <p class="text-gray-400">Our powerful models are constantly updated in the cloud to counter the latest misinformation techniques.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 py-10 px-4">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <p class="text-sm text-gray-400 mb-4 md:mb-0">&copy; 2024 Intellex. All Rights Reserved.</p>
+            <div class="flex items-center space-x-6">
+                 <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" /></svg>
+                </a>
+                <a href="https://twitter.com" target="_blank" class="text-gray-400 hover:text-white transition">
+                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 114.75 6.5 1.75 1.75 0 016.5 8.25zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93-.94 0-1.62.68-1.62 1.93V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.38.99 3.38 3.5V19z" /></svg>
+                </a>
+                 <a href="mailto:contact@intellex.ai" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.75 3A1.75 1.75 0 000 4.75v14.5C0 20.216.784 21 1.75 21h20.5A1.75 1.75 0 0024 19.25V4.75A1.75 1.75 0 0022.25 3H1.75zM1.5 4.75a.25.25 0 01.25-.25h20.5a.25.25 0 01.25.25v.531l-9.879 6.586a1.75 1.75 0 01-2.242 0L1.5 5.281V4.75zm.25 14.5a.25.25 0 01-.25-.25V6.852l9.512 6.341a3.25 3.25 0 004.176 0l9.512-6.341v12.398a.25.25 0 01-.25.25H1.75z"></path></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.scroll-animation');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
+
