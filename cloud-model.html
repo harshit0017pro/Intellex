@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intellex - Cloud-Based AI Model</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        .gradient-bg {
+            background-image: radial-gradient(circle at top, rgba(128, 0, 128, 0.2), transparent 40%),
+                              radial-gradient(circle at bottom right, rgba(0, 0, 255, 0.2), transparent 50%),
+                              radial-gradient(circle at bottom left, rgba(255, 20, 147, 0.15), transparent 60%);
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+
+    <!-- Header -->
+    <header class="sticky top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-lg">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-bold">Intellex</a>
+            <div class="hidden md:flex items-center space-x-8 text-sm">
+                <a href="index.html#problem" class="hover:text-gray-300 transition">The Problem</a>
+                <a href="index.html#features" class="hover:text-gray-300 transition">Features</a>
+                <a href="https://github.com" target="_blank" class="hover:text-gray-300 transition">GitHub</a>
+            </div>
+             <a href="app.html" class="bg-white text-black font-semibold py-2 px-5 rounded-lg hover:bg-gray-200 transition">Try Intellex</a>
+        </nav>
+    </header>
+
+    <!-- Page Content -->
+    <main class="container mx-auto px-6 py-24 md:py-32">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-left mb-8">
+                <a href="index.html" class="bg-white/10 p-2 rounded-full text-gray-300 hover:text-white hover:bg-white/20 transition inline-block">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </a>
+            </div>
+            <div class="text-center">
+                <h1 class="text-5xl md:text-6xl font-black mb-4">☁️ Cloud-Based AI Model</h1>
+                <p class="text-lg text-gray-300 mb-8">
+                    Our detection models live in the cloud, ensuring they are always up-to-date and ready to tackle the newest forms of misinformation.
+                </p>
+                <div class="text-left bg-black/20 p-8 rounded-lg border border-white/10">
+                    <h3 class="text-2xl font-bold mb-4">Always Evolving</h3>
+                    <p class="text-gray-400 mb-4">
+                      The landscape of AI-generated content changes daily. A static, downloadable model would quickly become obsolete. By hosting our models in the cloud, we can continuously retrain and update them with new data, ensuring that Intellex stays one step ahead of those who create fake content. You always get access to our latest and most powerful detection capabilities without ever needing to update an app.
+                    </p>
+                    <h3 class="text-2xl font-bold mb-4 mt-6">Benefits of Our Approach</h3>
+                    <ul class="list-disc list-inside text-gray-400 space-y-2">
+                        <li><strong>Constant Updates:</strong> Our models learn from new examples of deepfakes and fake news daily.</li>
+                        <li><strong>Scalability:</strong> Our cloud infrastructure can handle analysis requests from millions of users simultaneously.</li>
+                        <li><strong>Accessibility:</strong> Access the full power of Intellex from any device with a web browser.</li>
+                        <li><strong>Security:</strong> Your data is processed securely on our servers and is never stored long-term.</li>
+                    </ul>
+                </div>
+                <a href="app.html" class="mt-12 inline-block bg-white text-black font-semibold py-3 px-8 rounded-lg hover:bg-gray-200 transition">Use the Latest Model</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 py-10 px-4 mt-20">
+         <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <p class="text-sm text-gray-400 mb-4 md:mb-0">&copy; 2024 Intellex. All Rights Reserved.</p>
+            <div class="flex items-center space-x-6">
+                 <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" /></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+
